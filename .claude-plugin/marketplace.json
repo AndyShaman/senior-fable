@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "senior-fable",
+  "description": "Tech-lead orchestration for Claude Code. The expensive model decides, the cheap models type.",
+  "owner": {
+    "name": "Andy Shaman",
+    "url": "https://github.com/AndyShaman"
+  },
+  "plugins": [
+    {
+      "name": "senior-fable",
+      "description": "Turns your top-tier model into a tech lead: it keeps decomposition, architecture and final synthesis, delegating mechanical work to a Sonnet fast-worker and long investigations to a read-only Opus deep-reasoner.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

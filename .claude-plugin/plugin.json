@@ -1,0 +1,9 @@
+{
+  "name": "senior-fable",
+  "version": "1.0.0",
+  "description": "Tech-lead orchestration mode: the top-tier model keeps architecture and decisions, cheap subagents do the routine and the digging. Save tokens without losing quality.",
+  "author": {
+    "name": "Andy Shaman",
+    "url": "https://github.com/AndyShaman"
+  }
+}
