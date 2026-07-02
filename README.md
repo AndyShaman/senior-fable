@@ -73,7 +73,6 @@ agents/fast-worker.md          # Sonnet executor — verified mechanical work, s
 
 ## Related work
 
-- [ponytail](https://github.com/DietrichGebert/ponytail) — lazy-senior minimalism (how much code to write). Composes perfectly with Senior Fable (who writes it). Install both.
 - [wshobson/agents](https://github.com/wshobson/agents) — the canonical per-agent model-tier marketplace that inspired the routing idea.
 
 ## Keywords
