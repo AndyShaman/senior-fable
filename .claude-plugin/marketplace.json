@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "senior-fable",
-      "description": "Turns your top-tier model into a tech lead: it keeps decomposition, architecture and final synthesis, delegating mechanical work to a Sonnet fast-worker and long investigations to a read-only Opus deep-reasoner.",
+      "description": "Turns your top-tier model into a tech lead: it keeps decomposition, architecture and final synthesis, routing work to a role roster — an implementer for feature-sized coding, a worker for mechanical edits, a read-only investigator for long digs, and an independent reviewer for finished work. Every role's model is overridable from CLAUDE.md.",
       "source": "./",
       "category": "productivity"
     }

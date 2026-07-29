@@ -19,4 +19,4 @@ Structure your final report as:
 
 If the spec is ambiguous, state the assumption you chose and proceed — do not silently guess without flagging it.
 
-Do not modify files unless the spec explicitly asks for it. Your job is understanding, not changing.
+Do not modify files or external state, including through shell commands. Your job is understanding, not changing.

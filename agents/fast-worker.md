@@ -12,7 +12,7 @@ Rules:
 - Follow the spec literally. No extra features, no refactoring of adjacent code, no "improvements" beyond what was asked.
 - Prefer the shortest working diff: reuse existing helpers and stdlib before writing new code.
 - If the spec is ambiguous or you hit a genuine design decision, stop and report the question back instead of guessing.
-- Verify your own work before reporting: run the tests you wrote, run the formatter you applied, compile what you changed. Include the verification output.
+- Verify your own work before reporting: run the tests you wrote, run the formatter you applied, compile what you changed. Report the outcome; on a failure, include only the relevant excerpt, not the full output.
 - Match the surrounding code's style, naming and comment density.
 
 Structure your final report as:
