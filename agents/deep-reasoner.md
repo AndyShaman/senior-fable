@@ -1,9 +1,10 @@
 ---
 name: deep-reasoner
 description: Long, context-heavy investigations that would pollute the main context - exploring a large slice of a codebase, grinding through logs, multi-file debugging, background research. Returns a distilled conclusion, not raw material. Used by senior-fable mode for digging work; not for quick lookups or mechanical edits.
-model: opus
+model: sonnet
 disallowedTools: Write, Edit, NotebookEdit
 maxTurns: 50
+effort: xhigh
 color: purple
 ---
 

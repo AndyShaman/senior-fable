@@ -1,7 +1,8 @@
 ---
 name: fast-worker
-description: Mechanical, well-specified execution - writing tests to a spec, boilerplate, formatting, renames, simple edits with a clear definition of done. Not for design decisions, ambiguous requirements or investigations. Used by senior-fable mode for routine work.
+description: Well-specified execution - writing tests to a spec, boilerplate, formatting, renames, and small scoped changes (one to three files) with a clear definition of done. Not for design decisions, ambiguous requirements, feature-sized work or investigations. Used by senior-fable mode for routine work.
 model: sonnet
+effort: xhigh
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: blue
 ---

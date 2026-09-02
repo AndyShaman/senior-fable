@@ -27,19 +27,23 @@ Senior Fable fixes both with an orchestrator–worker pattern: subagents run in 
 
 Roles, not model names. The plugin ships working defaults; every tier is yours to override.
 
-| Role | Work | Ships as |
-|---|---|---|
-| **lead** | decomposition, architecture, reviewing results, final synthesis | your session model |
-| **implementer** | code where decisions live inside the task | `implementer` (opus) |
-| **worker** | tests to a spec, boilerplate, formatting, renames | `fast-worker` (sonnet) |
-| **investigator** | long digs that return a conclusion, not a dump | `deep-reasoner` (opus, no file editing) |
-| **reviewer** | independent review of finished work | `reviewer` (opus, no file editing) — or any different-family reviewer you have (e.g. a Codex CLI plugin) |
+| Role | Work | Ships as | Effort |
+|---|---|---|---|
+| **lead** | decomposition, architecture, reviewing results, final synthesis | your session model | medium (see below) |
+| **implementer** | feature-sized code where decisions live inside the task | `implementer` (opus) | medium |
+| **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` (sonnet) | xhigh |
+| **investigator** | long digs that return a conclusion, not a dump | `deep-reasoner` (sonnet, no file editing) | xhigh |
+| **reviewer** | independent review of finished work | `reviewer` (opus, no file editing) — or any different-family reviewer you have (e.g. a Codex CLI plugin) | high |
+
+Why these effort levels: Anthropic's Fable 5.1 system card shows the top tier peaking at **medium** on agentic coding — at high and above it starts editing outside the task (doc comments in neighbouring files, extra docs, an unasked CI job). Opus 5's migration guide calls its low/medium levels "unusually strong" and warns about scope expansion; Sonnet 5 is the first Sonnet with `xhigh`, recommended for its hardest coding work. Effort is set in each agent's `effort:` frontmatter field.
 
 Design decisions the skill enforces:
 
 - **Writer–verifier split.** Review crosses a role boundary: the reviewer never saw the reasoning that produced the change, so it judges the result on its own terms. Routine self-re-checking is explicitly *not* review — Claude 5 generation models already verify their own work.
 - **No file editing for observer roles.** `deep-reasoner` and `reviewer` have `Write`/`Edit` denied at the harness level and are instructed to change nothing — the same pattern Claude Code's built-in Explore agent uses. (Honest caveat: `Bash` stays available, so this is a strong guardrail, not a cryptographic guarantee.)
-- **Self-contained specs.** Subagents see CLAUDE.md but not your conversation, so every delegation carries its goal, file scope, constraints and definition of done.
+- **Self-contained specs, with the user's words verbatim.** Subagents see CLAUDE.md but not your conversation, so every delegation carries its goal, file scope, constraints and definition of done — and a `User's words` line quoting the request. A lead that paraphrases tends to narrow, widen or silently resolve the request, and the subagent then builds the paraphrase (the Fable 5.1 system card documents distorted and even fabricated user quotes in subagent briefings).
+- **Blind review.** The reviewer is never told who or what wrote the change: a model that knows the author is from its own family grades more leniently (self-recognition bias, also documented in the system card).
+- **Hooks are policy.** A denied command is not a broken check; the skill forbids splitting or rerouting commands to get past a hook.
 - **Failure triage.** A transient failure (rate limit, turn cap) means retry; only a wrong result means the spec was missing something — and a spec that produced a wrong result is never resent unchanged.
 - **Delegation restraint.** Claude 5 models delegate readily; the skill spends its words on when *not* to spawn: nothing that fits in a handful of tool calls, no fleets where one agent will do, no delegating to double-check yourself.
 
@@ -76,7 +80,8 @@ Give it substantial multi-step work and watch the panel: purple is the investiga
 
 ## Requirements & notes
 
-- **Model:** built for sessions running your strongest tier (Claude Fable 5, or Opus 5 if that's your top). On your cheapest model the skill deliberately does not apply — there is nothing below it to route to.
+- **Model:** built for sessions running your strongest tier (Claude Fable 5.1, or Opus 5 if that's your top). On your cheapest model the skill deliberately does not apply — there is nothing below it to route to.
+- **Subscription pools:** on Max plans Fable models are capped at 50% of the weekly limit while Opus and Sonnet draw from the whole of it. Delegation moves spend from the small pool to the large one — one more reason the lead does lead work only.
 - **A second model family is optional.** If you have an external reviewer (such as the OpenAI Codex plugin), point the reviewer role at it for a cross-family opinion; otherwise the bundled read-only `reviewer` covers the writer–verifier split in a fresh context.
 - **Billing:** on subscription plans this saves your top-tier usage limits; on API billing it saves money directly.
 - **Compaction-safe.** The skill is small enough to be re-attached whole after a context compact, and instructs the model to re-invoke itself if delegation behavior fades.
@@ -91,9 +96,11 @@ agents/deep-reasoner.md        # long investigations — no file editing, return
 agents/reviewer.md             # independent review — no file editing, reports everything, sorted by severity
 ```
 
-## Design notes (v1.1)
+## Design notes
 
-Reworked for Claude 5 generation models following Anthropic's July 2026 context-engineering guidance: rules the model no longer needs were removed (mandatory verification steps, report-format gates, rigid failure procedures), and what remains is mechanics the model cannot infer — model resolution order, billing tiers, harness behavior — plus interfaces enforced by tool permissions rather than prose.
+**v1.2 (Fable 5.1, September 2026).** Per-role effort (medium for the top tiers, xhigh for Sonnet 5), investigator moved to Sonnet 5, `User's words` line in the spec, blind review, hook-is-policy rule, the 50% Fable pool, and reuse of a running agent over a new spawn (a new spawn rewrites the prompt cache from zero). All of it traces to the Fable 5.1 system card and Anthropic's migration guides.
+
+**v1.1.** Reworked for Claude 5 generation models following Anthropic's July 2026 context-engineering guidance: rules the model no longer needs were removed (mandatory verification steps, report-format gates, rigid failure procedures), and what remains is mechanics the model cannot infer — model resolution order, billing tiers, harness behavior — plus interfaces enforced by tool permissions rather than prose.
 
 ## Related work
 
@@ -101,7 +108,7 @@ Reworked for Claude 5 generation models following Anthropic's July 2026 context-
 
 ## Keywords
 
-Claude Code plugin · multi-agent orchestration · subagents · token optimization · model routing · Claude Fable 5 · Opus · Sonnet · tech-lead pattern · orchestrator–worker · writer–verifier · context isolation · agent delegation
+Claude Code plugin · multi-agent orchestration · subagents · token optimization · model routing · Claude Fable 5.1 · Opus 5 · Sonnet 5 · effort levels · tech-lead pattern · orchestrator–worker · writer–verifier · context isolation · agent delegation
 
 ## License
 

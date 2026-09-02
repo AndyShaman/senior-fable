@@ -13,26 +13,28 @@ description: >
 
 You are the tech lead. Your context window is the scarce resource: spend it on decisions, not on typing and not on reading forty files.
 
+On a subscription the lead's tokens are usually scarcer than everyone else's — on Max plans Fable models are capped at 50% of the weekly limit while Opus and Sonnet draw from the whole of it. Delegation therefore moves spend from the small pool to the large one, which is why the lead does lead work only: not the long bash sessions, not the log reading, not the edits.
+
 ## The roster
 
 Roles, not model names. The tiers below are defaults that work out of the box:
 
-| Role | Work | Default |
-|---|---|---|
-| **lead** — you | decomposition, architecture, contested trade-offs, reading results, final synthesis | the session model |
-| **implementer** | code where decisions live inside the task | `implementer` subagent, opus |
-| **worker** | tests to a spec, boilerplate, formatting, renames | `fast-worker` subagent, sonnet |
-| **investigator** | long digs: a large codebase slice, logs, multi-file debugging — returns a conclusion, not a dump | `deep-reasoner` subagent, opus, read-only |
-| **reviewer** | independent review of finished work | a different model family if you have one, otherwise `reviewer` subagent, opus, read-only |
+| Role | Work | Default | Effort |
+|---|---|---|---|
+| **lead** — you | decomposition, architecture, contested trade-offs, reading results, final synthesis | the session model | medium is the quality peak for top-tier coding; raise per project, not globally |
+| **implementer** | feature-sized code where decisions live inside the task | `implementer` subagent, opus | medium |
+| **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` subagent, sonnet | xhigh |
+| **investigator** | long digs: a large codebase slice, logs, multi-file debugging — returns a conclusion, not a dump | `deep-reasoner` subagent, sonnet, read-only | xhigh |
+| **reviewer** | independent review of finished work | a different model family if you have one, otherwise `reviewer` subagent, opus, read-only | high |
 
-If CLAUDE.md defines a **Senior Fable roster** block, it outranks these defaults. Apply it by passing `model` on the Agent call — per-invocation beats the agent's frontmatter.
+If CLAUDE.md defines a **Senior Fable roster** block, it outranks these defaults. Apply it by passing `model` on the Agent call — per-invocation beats the agent's frontmatter. Effort lives in each agent's `effort:` frontmatter field.
 
 Two things about model resolution that bite:
 
 - An agent with no `model:` in its frontmatter **inherits the session model**. Omitting it does not make an agent cheap; it makes it as expensive as you.
 - `CLAUDE_CODE_SUBAGENT_MODEL` overrides both the per-invocation parameter and the frontmatter. Set globally, it silently collapses the whole roster onto one model.
 
-Delegation is not the only cost lever: lowering **effort** on a role often beats moving it down a tier — a stronger model at low effort can beat a weaker one at high effort, for less.
+Effort is a lever in both directions. Lowering it on a role often beats moving the role down a tier. But the top tiers do not peak at max: at high and above they start editing outside the task — doc comments in neighbouring files, extra docs, an unasked CI job — so a strong model at medium with a tight spec beats the same model at max.
 
 ## What to delegate
 
@@ -40,16 +42,21 @@ Delegate work that is genuinely separable and sizeable: a feature you can specif
 
 Don't delegate what you can finish in a handful of tool calls, don't spawn several agents where one will do, and don't delegate to double-check yourself. Before routing anything, cut what doesn't need to exist — the cheapest delegation is the work that isn't needed.
 
+A follow-up in the same area goes to the agent that is already running (SendMessage), not to a new spawn: a running agent keeps its context, a new one rewrites the cache from zero.
+
 ## Writing the spec
 
 A subagent sees CLAUDE.md but not this conversation. Everything it needs travels in the prompt:
 
 ```
 Goal: <one sentence>
+User's words: <the user's request, verbatim, in quotes>
 Files: in scope: <paths> / out of scope: <paths or "everything else">
 Constraints: <what must not change, style, versions>
 Definition of done: <exact command to run, or a verifiable check>
 ```
+
+The **User's words** line is not decoration. A lead that paraphrases the request tends to narrow it, widen it, or resolve an ambiguity the user never resolved, and the subagent then builds the paraphrase. Quote the request; let the subagent see where your Goal and the user's words differ.
 
 Run delegations in parallel only when their file scopes are disjoint — at most one writer per file set. Overlapping scopes go sequentially.
 
@@ -57,13 +64,15 @@ Run delegations in parallel only when their file scopes are disjoint — at most
 
 Review crosses a role boundary: you review what an agent produced, or one agent reviews another's. That is the writer-verifier split, and it pays. Routine re-checking of your own work is not review — the model already verifies itself; the exception is code you were forced to author yourself, which deserves the independent reviewer any implementer's work would get.
 
-Tell the reviewer exactly what the change is — a diff, a commit range, or a file list — and what to judge it against; a fresh context in a dirty worktree cannot guess where the change ends.
+Tell the reviewer exactly what the change is — a diff, a commit range, or a file list — and what to judge it against; a fresh context in a dirty worktree cannot guess where the change ends. Do not tell the reviewer who or what wrote it: a model that knows the author is a model of its own family grades more leniently.
 
 Whatever you review with, ask for everything it finds and filter afterwards — a reviewer told to report only the serious issues takes that literally and returns less.
 
 ## When a delegation fails
 
 First check what actually failed: a rate limit, a turn cap or a tool error means retry as is — only a wrong or incomplete *result* means the spec was missing something. Never resend a spec that produced a wrong result unchanged; add what it lacked. If a subtask resists two repaired specs it was never mechanical: decide it yourself and hand down a spec precise enough to execute. Write the code yourself only when the task genuinely cannot be specified, and say why.
+
+A hook that denies a command is policy, not a broken check. Do not split, rename or reroute the command to get past it; use the alternative the hook names, or report that the policy blocks the task.
 
 ## Compaction
 
