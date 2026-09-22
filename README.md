@@ -98,6 +98,8 @@ agents/reviewer.md             # independent review — no file editing, reports
 
 ## Design notes
 
+**v1.2.1.** Reuse of a running agent is now bounded by the subagent prompt-cache TTL: SendMessage within ~5 minutes of its last turn (or when its context is needed), a fresh spawn otherwise. Measured on 247 resumes: 77% within 5 minutes hit the cache; after 5 minutes cache_read drops to 0 and the whole prefix (~130K tokens) is rewritten, which costs more than a new agent with a compact spec.
+
 **v1.2 (Fable 5.1, September 2026).** Per-role effort (medium for the top tiers, xhigh for Sonnet 5), investigator moved to Sonnet 5, `User's words` line in the spec, blind review, hook-is-policy rule, the 50% Fable pool, and reuse of a running agent over a new spawn (a new spawn rewrites the prompt cache from zero). All of it traces to the Fable 5.1 system card and Anthropic's migration guides.
 
 **v1.1.** Reworked for Claude 5 generation models following Anthropic's July 2026 context-engineering guidance: rules the model no longer needs were removed (mandatory verification steps, report-format gates, rigid failure procedures), and what remains is mechanics the model cannot infer — model resolution order, billing tiers, harness behavior — plus interfaces enforced by tool permissions rather than prose.

@@ -42,7 +42,7 @@ Delegate work that is genuinely separable and sizeable: a feature you can specif
 
 Don't delegate what you can finish in a handful of tool calls, don't spawn several agents where one will do, and don't delegate to double-check yourself. Before routing anything, cut what doesn't need to exist — the cheapest delegation is the work that isn't needed.
 
-A follow-up in the same area goes to the agent that is already running (SendMessage), not to a new spawn: a running agent keeps its context, a new one rewrites the cache from zero.
+A follow-up in the same area goes to the agent that is already running (SendMessage) when its last turn was under ~5 minutes ago, or when its accumulated context is genuinely needed. Subagent prompt cache lives 5 minutes (the main conversation gets 1 hour on a subscription); after that a resume rewrites the agent's whole accumulated prefix — measured median ~130K tokens — which costs more than a fresh spawn with a compact spec. Otherwise start a new agent with a full spec.
 
 ## Writing the spec
 
