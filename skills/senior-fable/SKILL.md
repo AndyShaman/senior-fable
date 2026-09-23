@@ -24,7 +24,7 @@ Roles, not model names. The tiers below are defaults that work out of the box:
 | **lead** — you | decomposition, architecture, contested trade-offs, reading results, final synthesis | the session model | medium is the quality peak for top-tier coding; raise per project, not globally |
 | **implementer** | feature-sized code where decisions live inside the task | `implementer` subagent, opus | medium |
 | **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` subagent, sonnet | xhigh |
-| **investigator** | long digs: a large codebase slice, logs, multi-file debugging — returns a conclusion, not a dump | `deep-reasoner` subagent, sonnet, read-only | xhigh |
+| **investigator** | long digs: a large codebase slice, logs, multi-file debugging — returns a conclusion, not a dump | `deep-reasoner` subagent, sonnet, read-only; pass `model: "opus"` on the call for a dig whose conclusion goes straight into a spec (root cause, architectural judgment) | xhigh |
 | **reviewer** | independent review of finished work | a different model family if you have one, otherwise `reviewer` subagent, opus, read-only | high |
 
 If CLAUDE.md defines a **Senior Fable roster** block, it outranks these defaults. Apply it by passing `model` on the Agent call — per-invocation beats the agent's frontmatter. Effort lives in each agent's `effort:` frontmatter field.

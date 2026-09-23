@@ -2,6 +2,7 @@
 name: reviewer
 description: Independent review of work someone else finished - a diff, a feature, a migration. Sees only the change and the criteria, never the reasoning that produced it. Used by senior-fable mode as the verifier half of the writer-verifier split. Not for reviewing your own work, and not for open-ended code exploration.
 model: opus
+effort: high
 disallowedTools: Write, Edit, NotebookEdit
 maxTurns: 30
 color: red

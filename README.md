@@ -32,7 +32,7 @@ Roles, not model names. The plugin ships working defaults; every tier is yours t
 | **lead** | decomposition, architecture, reviewing results, final synthesis | your session model | medium (see below) |
 | **implementer** | feature-sized code where decisions live inside the task | `implementer` (opus) | medium |
 | **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` (sonnet) | xhigh |
-| **investigator** | long digs that return a conclusion, not a dump | `deep-reasoner` (sonnet, no file editing) | xhigh |
+| **investigator** | long digs that return a conclusion, not a dump | `deep-reasoner` (sonnet, no file editing; the lead passes `model: "opus"` for digs whose conclusion goes straight into a spec) | xhigh |
 | **reviewer** | independent review of finished work | `reviewer` (opus, no file editing) — or any different-family reviewer you have (e.g. a Codex CLI plugin) | high |
 
 Why these effort levels: Anthropic's Fable 5.1 system card shows the top tier peaking at **medium** on agentic coding — at high and above it starts editing outside the task (doc comments in neighbouring files, extra docs, an unasked CI job). Opus 5's migration guide calls its low/medium levels "unusually strong" and warns about scope expansion; Sonnet 5 is the first Sonnet with `xhigh`, recommended for its hardest coding work. Effort is set in each agent's `effort:` frontmatter field.
@@ -97,6 +97,8 @@ agents/reviewer.md             # independent review — no file editing, reports
 ```
 
 ## Design notes
+
+**v1.2.2.** Reviewer effort pinned to `high` in its frontmatter (it used to inherit the session's). Investigator stays on Sonnet for the grind, with a per-call `opus` override for digs whose conclusion becomes a spec.
 
 **v1.2.1.** Reuse of a running agent is now bounded by the subagent prompt-cache TTL: SendMessage within ~5 minutes of its last turn (or when its context is needed), a fresh spawn otherwise. Measured on 247 resumes: 77% within 5 minutes hit the cache; after 5 minutes cache_read drops to 0 and the whole prefix (~130K tokens) is rewritten, which costs more than a new agent with a compact spec.
 
