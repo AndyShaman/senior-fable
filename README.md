@@ -29,13 +29,13 @@ Roles, not model names. The plugin ships working defaults; every tier is yours t
 
 | Role | Work | Ships as | Effort |
 |---|---|---|---|
-| **lead** | decomposition, architecture, reviewing results, final synthesis | your session model | medium (see below) |
+| **lead** | decomposition, architecture, reviewing results, final synthesis | your session model | high (see below) |
 | **implementer** | feature-sized code where decisions live inside the task | `implementer` (opus) | medium |
-| **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` (sonnet) | xhigh |
-| **investigator** | long digs that return a conclusion, not a dump | `deep-reasoner` (sonnet, no file editing; the lead passes `model: "opus"` for digs whose conclusion goes straight into a spec) | xhigh |
+| **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` (sonnet) | medium |
+| **investigator** | long digs that return a conclusion, not a dump | `deep-reasoner` (sonnet, no file editing; the lead passes `model: "opus"` for digs whose conclusion goes straight into a spec) | high |
 | **reviewer** | independent review of finished work | `reviewer` (opus, no file editing) — or any different-family reviewer you have (e.g. a Codex CLI plugin) | high |
 
-Why these effort levels: Anthropic's Fable 5.1 system card shows the top tier peaking at **medium** on agentic coding — at high and above it starts editing outside the task (doc comments in neighbouring files, extra docs, an unasked CI job). Opus 5's migration guide calls its low/medium levels "unusually strong" and warns about scope expansion; Sonnet 5 is the first Sonnet with `xhigh`, recommended for its hardest coding work. Effort is set in each agent's `effort:` frontmatter field.
+Why these effort levels: Anthropic's guidance for the Claude 5.5 generation is to start low and raise effort only where you have measured a gain. Opus 5.5 starts at **medium** (it matches or beats Opus 5 at high). Sonnet 5.5 starts at **medium** for well-specified tasks and **high** for harder or longer ones — at `xhigh` it costs about what Opus does and starts review rounds of its own. Fable 5.1 starts at **high**. The Fable 5.1 system card notes that at higher effort the top tier starts editing outside the task (doc comments in neighbouring files, extra docs, an unasked CI job) — a risk for roles that edit, not for a lead that doesn't. Effort is set in each agent's `effort:` frontmatter field.
 
 Design decisions the skill enforces:
 
@@ -80,7 +80,8 @@ Give it substantial multi-step work and watch the panel: purple is the investiga
 
 ## Requirements & notes
 
-- **Model:** built for sessions running your strongest tier (Claude Fable 5.1, or Opus 5 if that's your top). On your cheapest model the skill deliberately does not apply — there is nothing below it to route to.
+- **Model:** built for sessions running your strongest tier (Claude Fable 5.1, or Opus 5.5 if that's your top). On your cheapest model the skill deliberately does not apply — there is nothing below it to route to.
+- **Aliases:** the agents ship with the `opus` and `sonnet` aliases, which resolve to Opus 5.5 and Sonnet 5.5 on the Anthropic API (Claude Code v2.1.284+). On Amazon Bedrock and Google Cloud the `sonnet` alias resolves to Sonnet 4.5 — pin full model IDs there, in the agent files or a roster override.
 - **Subscription pools:** on Max plans Fable models are capped at 50% of the weekly limit while Opus and Sonnet draw from the whole of it. Delegation moves spend from the small pool to the large one — one more reason the lead does lead work only.
 - **A second model family is optional.** If you have an external reviewer (such as the OpenAI Codex plugin), point the reviewer role at it for a cross-family opinion; otherwise the bundled read-only `reviewer` covers the writer–verifier split in a fresh context.
 - **Billing:** on subscription plans this saves your top-tier usage limits; on API billing it saves money directly.
@@ -98,6 +99,8 @@ agents/reviewer.md             # independent review — no file editing, reports
 
 ## Design notes
 
+**v1.3.0 (Opus 5.5 / Sonnet 5.5, September 2026).** Effort re-tuned to Anthropic's 5.5 guidance: worker `medium`, investigator `high`, lead `high`. Observer roles (`deep-reasoner`, `reviewer`) can no longer spawn subagents of their own. The lead delegates to roster agents only — built-in agents and forks inherit the session model. Fresh-or-continued context is now per role: reviewer and worker always start fresh; implementer and investigator are continued within their one-hour prompt cache (`experimental.cacheTtl: 1h`, Claude Code v2.1.248+).
+
 **v1.2.2.** Reviewer effort pinned to `high` in its frontmatter (it used to inherit the session's). Investigator stays on Sonnet for the grind, with a per-call `opus` override for digs whose conclusion becomes a spec.
 
 **v1.2.1.** Reuse of a running agent is now bounded by the subagent prompt-cache TTL: SendMessage within ~5 minutes of its last turn (or when its context is needed), a fresh spawn otherwise. Measured on 247 resumes: 77% within 5 minutes hit the cache; after 5 minutes cache_read drops to 0 and the whole prefix (~130K tokens) is rewritten, which costs more than a new agent with a compact spec.
@@ -112,7 +115,7 @@ agents/reviewer.md             # independent review — no file editing, reports
 
 ## Keywords
 
-Claude Code plugin · multi-agent orchestration · subagents · token optimization · model routing · Claude Fable 5.1 · Opus 5 · Sonnet 5 · effort levels · tech-lead pattern · orchestrator–worker · writer–verifier · context isolation · agent delegation
+Claude Code plugin · multi-agent orchestration · subagents · token optimization · model routing · Claude Fable 5.1 · Opus 5.5 · Sonnet 5.5 · effort levels · tech-lead pattern · orchestrator–worker · writer–verifier · context isolation · agent delegation
 
 ## License
 

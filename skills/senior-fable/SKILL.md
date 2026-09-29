@@ -21,20 +21,21 @@ Roles, not model names. The tiers below are defaults that work out of the box:
 
 | Role | Work | Default | Effort |
 |---|---|---|---|
-| **lead** — you | decomposition, architecture, contested trade-offs, reading results, final synthesis | the session model | medium is the quality peak for top-tier coding; raise per project, not globally |
+| **lead** — you | decomposition, architecture, contested trade-offs, reading results, final synthesis | the session model | high — the documented default; the lead's spend is controlled by delegating, not by lowering effort |
 | **implementer** | feature-sized code where decisions live inside the task | `implementer` subagent, opus | medium |
-| **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` subagent, sonnet | xhigh |
-| **investigator** | long digs: a large codebase slice, logs, multi-file debugging — returns a conclusion, not a dump | `deep-reasoner` subagent, sonnet, read-only; pass `model: "opus"` on the call for a dig whose conclusion goes straight into a spec (root cause, architectural judgment) | xhigh |
+| **worker** | tests to a spec, boilerplate, renames, scoped changes of 1–3 files | `fast-worker` subagent, sonnet | medium |
+| **investigator** | long digs: a large codebase slice, logs, multi-file debugging — returns a conclusion, not a dump | `deep-reasoner` subagent, sonnet, read-only; pass `model: "opus"` on the call for a dig whose conclusion goes straight into a spec (root cause, architectural judgment) | high |
 | **reviewer** | independent review of finished work | a different model family if you have one, otherwise `reviewer` subagent, opus, read-only | high |
 
 If CLAUDE.md defines a **Senior Fable roster** block, it outranks these defaults. Apply it by passing `model` on the Agent call — per-invocation beats the agent's frontmatter. Effort lives in each agent's `effort:` frontmatter field.
 
-Two things about model resolution that bite:
+Three things about model resolution that bite:
 
 - An agent with no `model:` in its frontmatter **inherits the session model**. Omitting it does not make an agent cheap; it makes it as expensive as you.
 - `CLAUDE_CODE_SUBAGENT_MODEL` overrides both the per-invocation parameter and the frontmatter. Set globally, it silently collapses the whole roster onto one model.
+- The built-in agents (`general-purpose`, `Plan`), forks, and built-in skills that fan out agents (`/code-review`, `/simplify`) **inherit the session model** — work sent to them is spent from the lead's pool. Delegate to the roster agents. When only a built-in fits, pass `model` on the call; a fork cannot be overridden.
 
-Effort is a lever in both directions. Lowering it on a role often beats moving the role down a tier. But the top tiers do not peak at max: at high and above they start editing outside the task — doc comments in neighbouring files, extra docs, an unasked CI job — so a strong model at medium with a tight spec beats the same model at max.
+Effort is a lever in both directions. Lowering it on a role often beats moving the role down a tier. Above the documented starting points the gain is small and the cost is not: Sonnet at xhigh costs about what Opus does and starts review rounds of its own, and the top tiers at high and above start editing outside the task — doc comments in neighbouring files, extra docs, an unasked CI job. That is a risk for roles that edit, which is why the implementer sits at medium and the lead, who does not edit, at high.
 
 ## What to delegate
 
@@ -42,7 +43,7 @@ Delegate work that is genuinely separable and sizeable: a feature you can specif
 
 Don't delegate what you can finish in a handful of tool calls, don't spawn several agents where one will do, and don't delegate to double-check yourself. Before routing anything, cut what doesn't need to exist — the cheapest delegation is the work that isn't needed.
 
-A follow-up in the same area goes to the agent that is already running (SendMessage) when its last turn was under ~5 minutes ago, or when its accumulated context is genuinely needed. Subagent prompt cache lives 5 minutes (the main conversation gets 1 hour on a subscription); after that a resume rewrites the agent's whole accumulated prefix — measured median ~130K tokens — which costs more than a fresh spawn with a compact spec. Otherwise start a new agent with a full spec.
+Fresh context or a continued one depends on the role. The reviewer and the worker always start fresh: a reviewer that remembers the previous round judges the fix against its own earlier opinion, and a worker's spec is complete by definition. The implementer and the investigator are continued (SendMessage) for a follow-up on their own work — a fix to what the implementer just built, a second question about the area the investigator just read — while their prompt cache is warm: these two ship with a one-hour cache (`experimental.cacheTtl: 1h`), any other subagent gets 5 minutes. Past that window a resume rewrites the agent's whole accumulated prefix — measured median ~130K tokens — which costs more than a fresh spawn with a compact spec, so continue a cold agent only when its accumulated context is genuinely needed. A new topic always gets a new agent.
 
 ## Writing the spec
 

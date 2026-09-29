@@ -3,6 +3,8 @@ name: implementer
 description: Feature-sized coding work where the decisions live inside the task - multi-file changes, refactors, end-to-end implementation from a spec. Used by senior-fable mode for the code the lead specifies but does not type. Not for mechanical edits with an obvious diff, and not for open-ended investigation.
 model: opus
 effort: medium
+experimental:
+  cacheTtl: 1h
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: green
 ---
