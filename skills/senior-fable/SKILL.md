@@ -55,9 +55,14 @@ User's words: <the user's request, verbatim, in quotes>
 Files: in scope: <paths> / out of scope: <paths or "everything else">
 Constraints: <what must not change, style, versions>
 Definition of done: <exact command to run, or a verifiable check>
+Report to: <a file path in the scratchpad, when the report may run past ~2,500 characters>
 ```
 
 The **User's words** line is not decoration. A lead that paraphrases the request tends to narrow it, widen it, or resolve an ambiguity the user never resolved, and the subagent then builds the paraphrase. Quote the request; let the subagent see where your Goal and the user's words differ.
+
+A bug gets its feedback loop before its fix. The investigator's Definition of done for a bug is the reproduction: the one command that goes red on *this* bug — a failing test, a replayed log, a script run against recorded data — with its output, or, when the test or script does not exist yet (the investigator cannot write to the repo), its full text and the failure it must show. Do not issue a fix spec without that reproduction. The fix spec carries it: the implementer first puts the test in place and shows it red for the stated reason — if it is not, they stop and report — then fixes until the same command is green; the test stays as the regression test. When the bug shows only on a device you cannot drive, build the loop from what the device left behind (logs, a recorded trace) instead of asking the user to try again; a trace recorded from a real device enters the repo only stripped of personal data. If no reproduction can be built, tell the user what was tried and get their go-ahead before a fix that nothing verifies.
+
+Long reports travel as files. A report delivered as a message is cut off after a few thousand characters, and asking for it again costs a round trip. Name a scratchpad path in **Report to**; the agent writes the full report there and replies with the answer in a few lines plus the path.
 
 Run delegations in parallel only when their file scopes are disjoint — at most one writer per file set. Overlapping scopes go sequentially.
 
@@ -67,7 +72,13 @@ Review crosses a role boundary: you review what an agent produced, or one agent 
 
 Tell the reviewer exactly what the change is — a diff, a commit range, or a file list — and what to judge it against; a fresh context in a dirty worktree cannot guess where the change ends. Do not tell the reviewer who or what wrote it: a model that knows the author is a model of its own family grades more leniently.
 
-Whatever you review with, ask for everything it finds and filter afterwards — a reviewer told to report only the serious issues takes that literally and returns less.
+Give the reviewer the spec along with the change and ask for two reads: what is wrong, and what is in the change that the spec does not ask for. The second read is the counterweight to the first — a review that only hunts defects pushes every round toward more code. A subagent reviewer always gets a **Report to** path, one of its own and not the path in the spec under review: a full review rarely fits in a message.
+
+In the first round, whatever you review with, ask for everything it finds and filter afterwards — a reviewer told to report only the serious issues takes that literally and returns less.
+
+The filtering is yours, and it is where review either pays or bloats the change. Fix a finding only when it names something concrete: an input or a sequence that can actually occur and what breaks when it does, a requirement of the spec the change does not meet, or something built that the spec did not ask for. A finding that names none of these — a theoretical race, a defensive branch for a state nothing produces — is declined with one line of why, not fixed.
+
+Review rounds are bounded. The second round is a check, not a fresh hunt: give a new reviewer the first round's blocking findings and the updated change, and ask only whether each is fixed and whether the fix broke what it touched. A third round needs the user's go-ahead: a change that has not converged in two is usually over-built, and the remedy is to cut it, not to review it again.
 
 ## When a delegation fails
 

@@ -25,3 +25,5 @@ Structure your final report as:
 - **Checks** — the commands you ran and their outcome; on a failure, only the relevant excerpt, not the full output.
 - **Decisions** — choices you made inside the spec that the lead might have made differently.
 - **Open** — anything you could not resolve, stated explicitly rather than worked around.
+
+When the spec names a **Report to** path, write the full report to that file and make your final message the outcome of **Checks** in one line, **Open**, and the path. A final message longer than ~2,500 characters is cut off in transit, so without a path keep it under that.

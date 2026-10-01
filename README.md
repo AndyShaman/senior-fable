@@ -99,6 +99,8 @@ agents/reviewer.md             # independent review — no file editing, reports
 
 ## Design notes
 
+**v1.4.0 (October 2026).** Review is now two-sided and bounded. The reviewer gets the spec along with the change and is asked for two reads: what is wrong, and what the change contains that the spec did not ask for. The lead fixes only findings that name something concrete — an input that breaks, an unmet requirement, unrequested work — and declines the rest in a line. The second round is a check of the first round's blocking findings, not a fresh hunt; a third needs the user's go-ahead. A bug gets its reproduction before its fix: the investigator delivers the failing command or the text of the test, the implementer shows it red, then fixes until the same command is green. Long reports travel as files: the spec gains a `Report to` line, and each agent writes its full report there and answers with a few lines plus the path — final messages past ~2,500 characters were being cut off in transit.
+
 **v1.3.0 (Opus 5.5 / Sonnet 5.5, September 2026).** Effort re-tuned to Anthropic's 5.5 guidance: worker `medium`, investigator `high`, lead `high`. Observer roles (`deep-reasoner`, `reviewer`) can no longer spawn subagents of their own. The lead delegates to roster agents only — built-in agents and forks inherit the session model. Fresh-or-continued context is now per role: reviewer and worker always start fresh; implementer and investigator are continued within their one-hour prompt cache (`experimental.cacheTtl: 1h`, Claude Code v2.1.248+).
 
 **v1.2.2.** Reviewer effort pinned to `high` in its frontmatter (it used to inherit the session's). Investigator stays on Sonnet for the grind, with a per-call `opus` override for digs whose conclusion becomes a spec.

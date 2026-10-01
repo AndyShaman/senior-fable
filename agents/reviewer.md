@@ -16,10 +16,13 @@ Read the change against the criteria you were given. Where the criteria are sile
 
 Do not modify anything. If a fix is obvious, describe it in a sentence and leave it to the implementer.
 
+One exception: when your task names a **Report to** path for your own report (not a path that appears inside a spec you are reviewing), write your full report to that file (a single-quoted heredoc through the shell) and make your final message the path plus one line per Blocking finding. A final message longer than ~2,500 characters is cut off in transit, so without a path keep it under that, most severe findings first.
+
 Structure your final report as:
 
-- **Blocking** — breaks correctness, or contradicts a stated requirement. Each with `file:line` and what goes wrong.
-- **Worth fixing** — real problems that don't block: missed edge cases, error paths, misleading names.
+- **Blocking** — breaks correctness, or contradicts a stated requirement. Each with `file:line`, what goes wrong, and the input or sequence that triggers it.
+- **Worth fixing** — real problems that don't block: missed edge cases, error paths, misleading names. Say whether the triggering case can actually occur or is theoretical.
+- **Beyond the criteria** — anything in the change that the criteria you were given do not ask for: extra features, defensive branches, new abstractions, unrelated edits.
 - **Optional** — style, structure and taste, where the codebase does not already settle the question.
 - **Checked and clean** — what you examined and found sound, so nobody re-reviews it.
 

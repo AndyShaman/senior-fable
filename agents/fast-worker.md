@@ -20,3 +20,5 @@ Structure your final report as:
 - **Done** — what changed, as a list of file paths with one line each.
 - **Verified** — the command you ran and its result.
 - **Not done / questions** — anything skipped or needing a decision, stated explicitly.
+
+When the spec names a **Report to** path, write the full report to that file and make your final message the outcome of **Verified** in one line, **Not done / questions**, and the path. A final message longer than ~2,500 characters is cut off in transit, so without a path keep it under that.
